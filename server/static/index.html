@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExamGuard Rover</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo">◎</span> ExamGuard Rover</div>
+  <div class="top-stats">
+    <span id="activityPill" class="pill warn hidden"></span>
+    <span id="connPill" class="pill bad">Car offline</span>
+    <span class="pill" id="ratePill">0 Hz</span>
+    <span class="pill" id="modelPill">No model</span>
+  </div>
+</header>
+
+<main>
+  <!-- MONITOR -->
+  <section id="tab-monitor">
+    <div class="monitor-top">
+      <div class="card hero" id="statusCard">
+        <div class="label">Detection</div>
+        <div class="hero-status" id="statusText">Waiting for the car…</div>
+        <div class="hero-zone">Car is <b id="zoneVal">–</b></div>
+        <div class="gauge"><div id="scoreBar"></div><span id="thrMark"></span></div>
+        <div class="chips">
+          <span class="chip" id="chipMl">ML model <b id="cMlV">–</b></span>
+          <span class="chip" id="chipBle">Bluetooth <b id="cBleV">–</b></span>
+          <span class="chip" id="chipRule">Magnet <b id="cRuleV">–</b></span>
+          <span class="muted small">score <b id="scoreVal">0.00</b> · alert at <b id="thrVal">–</b></span>
+        </div>
+      </div>
+
+      <div class="card car">
+        <div class="card-head"><h3>On the car</h3><span class="muted small" id="fwVal"></span></div>
+        <div class="sensors">
+          <div class="sensor"><span>Magnetic change</span><b id="hallDev">0</b><em>threshold ±<span id="hallThr">–</span></em></div>
+          <div class="sensor"><span>Obstacle ahead</span><b id="distState">– cm</b></div>
+          <div class="sensor"><span>Bluetooth</span><b id="carBle">0</b><em id="carBleAudio">no audio devices</em></div>
+          <div class="sensor"><span>Motors</span><b id="motorState">Stopped</b><em id="carLed">LED: –</em></div>
+        </div>
+        <div class="drive">
+          <div class="pad">
+            <span></span><button data-cmd="F" title="W / ↑">▲</button><span></span>
+            <button data-cmd="L" title="A / ←">◀</button><button data-cmd="S" class="stop" title="Space">■</button><button data-cmd="R" title="D / →">▶</button>
+            <span></span><button data-cmd="B" title="S / ↓">▼</button><span></span>
+          </div>
+          <div>
+            <label class="slider">Speed <b id="speedVal">60%</b><input id="speed" type="range" min="30" max="100" value="60"></label>
+            <div id="blockedMsg" class="warn hidden">Forward blocked by obstacle</div>
+            <p class="hint">Keys: W A S D or arrows, Space stops.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2-1">
+      <div class="card">
+        <div class="card-head"><h3>Room map</h3>
+          <div class="row tight">
+            <label class="chk"><input type="checkbox" id="placeMode"> Place car</label>
+            <button class="ghost sm" id="resetMap">New start here</button>
+          </div>
+        </div>
+        <canvas id="mapCanvas" height="360"></canvas>
+        <div id="estList" class="est-row"></div>
+        <p class="hint">Driven <b id="coverage">0 m</b> · car is <b id="poseVal">–</b>. Distances are from where the car started (grid = 1 m).</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Alerts</h3><button class="ghost sm" id="clearAlerts">Clear</button></div>
+        <div id="alertList" class="alert-list"></div>
+      </div>
+    </div>
+
+    <details class="card" id="signals">
+      <summary><h3>Live signals</h3><span class="muted small" id="bleCount">0 devices</span></summary>
+      <div class="grid-2 mt">
+        <div><h4>Magnetic change (60 s)</h4><canvas id="hallChart" height="160"></canvas></div>
+        <div><div class="card-head"><h4>Detection score</h4>
+          <div class="legend"><i class="l-score"></i>score <i class="l-ml"></i>ML <i class="l-ble"></i>BLE <i class="l-rule"></i>magnet</div></div>
+          <canvas id="scoreChart" height="160"></canvas></div>
+      </div>
+      <h4 class="mt">Nearby Bluetooth devices</h4>
+      <table class="tbl"><thead><tr><th>Type</th><th>Device</th><th>Signal</th><th>≈ distance</th><th></th></tr></thead>
+        <tbody id="bleTable"></tbody></table>
+    </details>
+
+    <details class="card" id="setupPanel">
+      <summary><h3>Calibration &amp; settings</h3></summary>
+      <div class="row">
+        <button class="primary" id="calBtn">Calibrate magnetic sensor</button>
+        <span class="muted small" id="calInfo"></span>
+      </div>
+      <p class="hint">Before each exam: park the car away from magnets, phones and metal, then calibrate (takes about 6 s).</p>
+      <div class="form mt" id="setBasic"></div>
+      <div class="row">
+        <button id="saveSettings">Save settings</button>
+        <label class="chk"><input type="checkbox" id="browserSound" checked> Beep in this browser on alerts</label>
+      </div>
+      <h4 class="mt">Ignored Bluetooth devices</h4>
+      <div id="ignoredList" class="muted small">None</div>
+    </details>
+  </section>
+
+</main>
+
+<footer class="privacy">An alert means a <b>possible</b> device near the car. It does not identify or accuse any student.</footer>
+<div id="toasts"></div>
+<script src="/static/charts.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>
